@@ -10,6 +10,8 @@ Reverse a singly linked list.
  *     ListNode(int x) { val = x; }
  * }
  */
+
+iterative 
 public class Solution {
     public ListNode reverseList(ListNode head) {
         ListNode prev = null;
@@ -27,6 +29,7 @@ public class Solution {
      1 -> 2 -> 3 -> N
 N <- 1 <- 2 <- 3
 
+Recursive
 public class Solution {
     public ListNode reverseList(ListNode head) {
         if(head == null || head.next == null) {
