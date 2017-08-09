@@ -47,3 +47,44 @@ You could stay at a city beyond the number of vacation days, but you should work
 If you fly from the city A to the city B and take the vacation on that day, the deduction towards vacation days will count towards the vacation days of city B in that week.
 We don't consider the impact of flight hours towards the calculation of vacation days.
 
+public class Solution {
+    public int maxVacationDays(int[][] flights, int[][] days) {
+        if(flights == null || flights.length == 0 || flights[0].length == 0
+           || days == null || days.length == 0 || days[0].length == 0) {
+            return 0;
+        }
+        
+        for(int i = 1; i < days.length; i++) {
+            if(flights[0][i] != 1) {
+                days[i][0] = -1;
+            }
+        }
+        
+        for(int j = 1; j < days[0].length; j++) {
+            for(int i = 0; i < days.length; i++) {
+                int current = -1;
+                for(int k = 0; k < days.length; k++) {
+                    if(k == i) {
+                        if(days[i][j - 1] == -1) {
+                            current = Math.max(-1, current);
+                        } else {
+                            current = Math.max(current, days[k][j - 1] + days[i][j]);
+                        }
+                        continue;
+                    }
+                    if(days[k][j - 1] == -1 || flights[k][i] == 0) {
+                        continue;
+                    }
+                    current = Math.max(current, days[k][j - 1] + days[i][j]);
+                }
+                days[i][j] = current;
+            }
+        }
+        int max = 0;
+        for(int i = 0; i < days.length; i++) {
+            max = Math.max(max, days[i][days[0].length - 1]);
+        }
+        return max;
+    }
+}
+
