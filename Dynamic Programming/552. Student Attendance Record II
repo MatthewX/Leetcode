@@ -38,6 +38,6 @@ public class Solution {
             A1L1 = A1L0;
             A1L0 = A1L0_;
         }
-        return (int) A1L0;
+        return (int) ((A0L0 + A0L1 + A0L2 + A1L0 + A1L1 + A1L2) % M);
     }
 }
