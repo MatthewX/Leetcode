@@ -15,3 +15,45 @@ s = "3[a2[c]]", return "accaccacc".
 s = "2[abc]3[cd]ef", return "abcabccdcdcdef".
 
 
+class Solution {
+    public String decodeString(String s) {
+        if(s == null || s.length() == 0) {
+            return "";
+        }
+        StringBuffer sb = new StringBuffer();
+        int num = 0;
+        int i = 0;
+        while(i < s.length()) {
+            char c = s.charAt(i);
+            while(i < s.length() && s.charAt(i) >= '0' && s.charAt(i) <= '9') {
+                num = num * 10 + (s.charAt(i) - '0');
+                i++;
+            }
+            
+            if(s.charAt(i) == '[') {
+                int count = 1;
+                StringBuffer sub = new StringBuffer();
+                sub.append(s.charAt(i++));
+                while(i < s.length() && count != 0) {
+                    if(s.charAt(i) == '[') {
+                        count++;
+                        
+                    } else if(s.charAt(i) == ']') {
+                        count--;
+                    }
+                    sub.append(s.charAt(i));
+                    i++;
+                }
+                String subString = decodeString(sub.toString().substring(1, sub.length() - 1));
+                for(int j = 0; j < num; j++) {
+                    sb.append(subString);
+                }
+                num = 0;
+            } else {
+                sb.append(s.charAt(i));
+                i++;
+            }
+        }
+        return sb.toString();
+    }
+}
