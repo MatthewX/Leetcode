@@ -30,3 +30,54 @@ The number of balls on the table won't exceed 20, and the string represents thes
 The number of balls in your hand won't exceed 5, and the string represents these balls is called "hand" in the input.
 Both input strings will be non-empty and only contain characters 'R','Y','B','G','W'.
 
+class Solution {
+    private int min = Integer.MAX_VALUE;
+    public int findMinStep(String board, String hand) {
+        if(board == null || board.length() == 0 || hand == null || hand.length() == 0) {
+            return 0;
+        }
+        int[] count = new int[26];
+        for(int i = 0; i < hand.length(); i++) {
+            count[hand.charAt(i) - 'A']++;
+        }
+        helper(board, count, 0);
+        return min == Integer.MAX_VALUE? -1: min;
+        
+    }
+    
+    private void helper(String board, int[] count, int num) {
+        if(board.equals("")) {
+            min = Math.min(min, num);
+            return;
+        }
+        int i = 0, j = 0;
+        while(i < board.length()) {
+            while(j < board.length() && board.charAt(j) == board.charAt(i)) {
+                j++;
+            }
+            int need = 3 - (j - i);
+            if(count[board.charAt(i) - 'A'] >= need) {
+                String removed = getRemovedBoard(board.substring(0, i) + board.substring(j));
+                count[board.charAt(i) - 'A'] -= need;
+                helper(removed, count, num + need);
+                count[board.charAt(i) - 'A'] += need;
+                
+            }
+            i = j;
+        }
+    }
+    private String getRemovedBoard(String board) {
+        int i = 0, j = 0;
+        while(i < board.length()) {
+            while(j < board.length() && board.charAt(j) == board.charAt(i)) {
+                j++;
+            }
+            if(j - i >= 3) {
+                return getRemovedBoard(board.substring(0, i) + board.substring(j));
+            }
+            i = j;
+        }
+        return board;
+        
+    }
+}
