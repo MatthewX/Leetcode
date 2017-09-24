@@ -1,0 +1,142 @@
+648. Replace Words
+
+In English, we have a concept called root, which can be followed by some other words to form another longer word - let's call this word successor. For example, the root an, followed by other, which can form another word another.
+
+Now, given a dictionary consisting of many roots and a sentence. You need to replace all the successor in the sentence with the root forming it. If a successor has many roots can form it, replace it with the root with the shortest length.
+
+You need to output the sentence after the replacement.
+
+Example 1:
+Input: dict = ["cat", "bat", "rat"]
+sentence = "the cattle was rattled by the battery"
+Output: "the cat was rat by the bat"
+Note:
+The input will only have lower-case letters.
+1 <= dict words number <= 1000
+1 <= sentence words number <= 1000
+1 <= root length <= 100
+1 <= sentence words length <= 1000
+
+public class Solution {
+    public class TrieNode {
+        // Initialize your data structure here.
+        public HashMap<Character, TrieNode> children;
+        public boolean isEnd;
+        public TrieNode() {
+            children = new HashMap<Character, TrieNode>();
+            isEnd = false;
+        }
+    }
+
+    public class Trie {
+        private TrieNode root;
+    
+        public Trie() {
+            root = new TrieNode();
+        }
+        
+        public TrieNode getRoot() {
+            return root;
+        }
+
+        // Inserts a word into the trie.
+        public void insert(String word) {
+            if(word == null || word.length() == 0) {
+                return;
+            }   
+            TrieNode current = root;
+            for(int i = 0; i < word.length(); i++) {
+                char c = word.charAt(i);
+                TrieNode next = current.children.get(c);
+                if(next == null) {
+                    next = new TrieNode();
+                    current.children.put(c, next);
+                }
+                current = next;
+            }
+            current.isEnd = true;
+        }
+
+        // Returns if the word is in the trie.
+        public boolean search(String word) {
+            TrieNode current = root;
+            for(int i = 0; i < word.length(); i++) {
+                char c = word.charAt(i);
+                TrieNode next = current.children.get(c);
+                if(next == null) {
+                    return false;
+                }
+                current = next;
+            }
+            return current.isEnd;
+        }
+
+        // Returns if there is any word in the trie
+        // that starts with the given prefix.
+        public boolean startsWith(String prefix) {
+            TrieNode current = root;
+            for(int i = 0; i < prefix.length(); i++) {
+                char c = prefix.charAt(i);
+                TrieNode next = current.children.get(c);
+                if(next == null) {
+                    return false;
+                }
+                current = next;
+            }
+            return true;
+        }
+    }
+    public String replaceWords(List<String> dict, String sentence) {
+        if(dict == null || dict.isEmpty() || sentence == null || sentence.length() == 0) {
+            return sentence;
+        }
+        String[] words = sentence.split(" ");
+        Trie trie = new Trie();
+        for(String s: dict) {
+            trie.insert(s);
+        }
+        
+        StringBuffer result = new StringBuffer();
+        
+        for(String s: words) {
+            TrieNode root = trie.getRoot();
+            int i = 0;
+            StringBuffer sb = new StringBuffer();
+            boolean found = false;
+            // while(root != null && !root.isEnd) {
+            //     char c = s.charAt(i);
+            //     if(root.getChildren().containsKey(c)) {
+            //         sb.append(c);
+            //         root = root.getChildren().get(c);
+            //         if(root.isEnd) {
+            //             found = true;
+            //             break;
+            //         }
+            // }
+            while(!found && root != null && i < s.length()) {
+                char c = s.charAt(i);
+                if(root.children.containsKey(c)) {
+                    sb.append(c);
+                    root = root.children.get(c);
+                    if(root.isEnd) {
+                        found = true;
+                        break;
+                    }
+                } else {
+                    break;
+                }
+                i++;
+            }
+            
+            if(found) {
+                result.append(sb + " ");
+            } else {
+                result.append(s + " ");
+            }
+        }
+        return result.toString().substring(0, result.length() - 1);
+        
+    }    
+    
+    
+}
