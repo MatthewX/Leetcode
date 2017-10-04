@@ -1,0 +1,74 @@
+689. Maximum Sum of 3 Non-Overlapping Subarrays
+
+In a given array nums of positive integers, find three non-overlapping subarrays with maximum sum.
+
+Each subarray will be of size k, and we want to maximize the sum of all 3*k entries.
+
+Return the result as a list of indices representing the starting position of each interval (0-indexed). If there are multiple answers, return the lexicographically smallest one.
+
+Example:
+Input: [1,2,1,2,6,7,5,1], 2
+Output: [0, 3, 5]
+Explanation: Subarrays [1, 2], [2, 6], [7, 5] correspond to the starting indices [0, 3, 5].
+We could have also taken [2, 1], but an answer of [1, 3, 5] would be lexicographically larger.
+Note:
+nums.length will be between 1 and 20000.
+nums[i] will be between 1 and 65535.
+k will be between 1 and floor(nums.length / 3).
+
+class Solution {
+    public int[] maxSumOfThreeSubarrays(int[] nums, int k) {
+        if(nums == null || nums.length == 0 || k <= 0 || nums.length < 3 * k) {
+            return null;
+        }
+        /**
+        1. fix the middle subarray position
+        2. find the left max and right max
+        
+        0, 1, 2, 3, 4, 5
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+        
+        
+        
+        */
+        int[] result = new int[3];
+        int[] sum = new int[nums.length];
+        sum[0] = nums[0];
+        for(int i = 1; i < sum.length; i++) {
+            sum[i] = sum[i - 1] + nums[i];
+        }
+        
+        int max = 0;
+        for(int i = k; i < nums.length - 2 * k + 1; i++) {
+            int middle = sum[i + k - 1] - sum[i - 1];
+            int leftIndex = 0, leftMax = 0;
+            int rightIndex = i + k, rightMax = 0;
+            
+            // doing left
+            for(int j = 0; j <= i - k; j++) {
+                int leftSum = sum[j + k - 1] - (j == 0? 0: sum[j - 1]);
+                if(leftSum > leftMax) {
+                    leftMax = leftSum;
+                    leftIndex = j;
+                }
+            }
+            
+            // doing right
+            for(int j = i + k; j < nums.length - k + 1; j++) {
+                int rightSum = sum[j + k - 1] - sum[j - 1];
+                if(rightSum > rightMax) {
+                    rightMax = rightSum;
+                    rightIndex = j;
+                }
+            }
+            
+            if(leftMax + rightMax + middle > max) {
+                max = leftMax + rightMax + middle;
+                result[0] = leftIndex;
+                result[1] = i;
+                result[2] = rightIndex;
+            }
+        }
+        return result;
+    }
+}
