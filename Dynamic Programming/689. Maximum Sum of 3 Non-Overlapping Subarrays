@@ -16,6 +16,72 @@ nums.length will be between 1 and 20000.
 nums[i] will be between 1 and 65535.
 k will be between 1 and floor(nums.length / 3).
 
+
+O(n)
+class Solution {
+    public int[] maxSumOfThreeSubarrays(int[] nums, int k) {
+        if(nums == null || nums.length == 0 || k <= 0 || nums.length < 3 * k) {
+            return null;
+        }
+        /**
+        1. fix the middle subarray position
+        2. find the left max and right max
+        
+        0, 1, 2, 3, 4, 5
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+        */
+        
+        int[] result = new int[3];
+        int[] sum = new int[nums.length];
+        sum[0] = nums[0];
+        for(int i = 1; i < sum.length; i++) {
+            sum[i] = sum[i - 1] + nums[i];
+        }
+        int[] left = new int[nums.length];
+        int prev = 0;
+        int[] right = new int[nums.length];
+        
+        // doing left
+        for(int i = 0; i <= nums.length - 3 * k; i++) {
+            int currentSum = sum[i + k - 1] - (i == 0? 0: sum[i - 1]);
+            if(currentSum > prev) {
+                prev = currentSum;
+                left[i] = i;
+            } else {
+                left[i] = left[i - 1];
+            }
+        }
+        
+        prev = 0;
+        
+        // doing right;
+        for(int i = nums.length - k; i >= 2 * k; i--) {
+            int currentSum = sum[i + k - 1] - sum[i - 1];
+            if(currentSum > prev) {
+                prev = currentSum;
+                right[i] = i;
+            } else {
+                right[i] = right[i + 1];
+            }
+        }
+        
+        int max = 0;
+        for(int i = k; i <= nums.length - 2 * k; i++) {
+            int middle = sum[i + k - 1] - sum[i - 1];
+            int leftSum = sum[left[i - k] + k - 1] - (left[i - k] == 0? 0: sum[left[i - k] - 1]);
+            int rightSum = sum[right[i + k] + k - 1] - sum[right[i + k] - 1];
+            if(middle + leftSum + rightSum > max) {
+                max = middle + leftSum + rightSum;
+                result[0] = left[i - k];
+                result[1] = i;
+                result[2] = right[i + k];
+            }
+        }
+        return result;
+        
+    }
+}
+
 class Solution {
     public int[] maxSumOfThreeSubarrays(int[] nums, int k) {
         if(nums == null || nums.length == 0 || k <= 0 || nums.length < 3 * k) {
