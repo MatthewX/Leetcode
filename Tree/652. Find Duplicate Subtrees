@@ -47,7 +47,7 @@ class Solution {
         if(map.getOrDefault(serialize, 0) == 1) {
             result.add(root);
         }
-        map.put(serialize, map.getOrDefault(serialize) + 1);
+        map.put(serialize, map.getOrDefault(serialize, 0) + 1);
         return serialize;
     }
 }
