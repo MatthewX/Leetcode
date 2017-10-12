@@ -40,3 +40,62 @@ target has length in the range [1, 15], and consists of lowercase English letter
 In all test cases, all words were chosen randomly from the 1000 most common US English words, and the target was chosen as a concatenation of two random words.
 The time limit may be more challenging than usual. It is expected that a 50 sticker test case can be solved within 35ms on average.
 
+class Solution {
+    public int minStickers(String[] stickers, String target) {
+        if(stickers == null || stickers.length == 0 || target == null || target.length() == 0) {
+            return 0;
+        }
+        Map<String, Integer> map = new HashMap<>();
+        map.put("", 0);
+        dfs(stickers, target, map);
+        return map.get(target) == Integer.MAX_VALUE? -1: map.get(target);
+    }
+    private int dfs(String[] stickers, String target, Map<String, Integer> map) {
+        if(map.containsKey(target)) {
+            return map.get(target);
+        }
+        int[] count = getCount(target);
+        int min = Integer.MAX_VALUE;
+        for(int i = 0; i < stickers.length; i++) {
+            String sticker = stickers[i];
+            for(int j = 0; j < sticker.length(); j++) {
+                char c = sticker.charAt(j);
+                if(count[c - 'a'] != 0) {
+                    String s = getString(Arrays.copyOf(count, count.length), sticker);
+                    int next = dfs(stickers, s, map);
+                    if(next != Integer.MAX_VALUE) {
+                        min = Math.min(min, 1 + next);
+                    }
+                }
+            }
+        }
+        map.put(target, min);
+        return min;
+    }
+    
+    private String getString(int[] count, String sticker) {
+        StringBuffer sb = new StringBuffer();
+        for(int i = 0; i < sticker.length(); i++) {
+            if(count[sticker.charAt(i) - 'a'] > 0) {
+                count[sticker.charAt(i) - 'a']--;
+            }
+        }
+        for(int i = 0; i < count.length; i++) {
+            if(count[i] > 0) {
+                for(int j = 0; j < count[i]; j++) {
+                    sb.append((char)(i + 'a'));
+                }
+            }
+        }
+        return sb.toString();
+    }
+    
+    private int[] getCount(String target) {
+        int[] count = new int[26];
+        for(int i = 0; i < target.length(); i++) {
+            count[target.charAt(i) - 'a']++;
+        }
+        return count;
+    }
+    
+}
