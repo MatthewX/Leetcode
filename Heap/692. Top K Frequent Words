@@ -1,0 +1,80 @@
+692. Top K Frequent Words
+
+Given a non-empty list of words, return the k most frequent elements.
+
+Your answer should be sorted by frequency from highest to lowest. If two words have the same frequency, then the word with the lower alphabetical order comes first.
+
+Example 1:
+Input: ["i", "love", "leetcode", "i", "love", "coding"], k = 2
+Output: ["i", "love"]
+Explanation: "i" and "love" are the two most frequent words.
+    Note that "i" comes before "love" due to a lower alphabetical order.
+Example 2:
+Input: ["the", "day", "is", "sunny", "the", "the", "the", "sunny", "is", "is"], k = 4
+Output: ["the", "is", "sunny", "day"]
+Explanation: "the", "is", "sunny" and "day" are the four most frequent words,
+    with the number of occurrence being 4, 3, 2 and 1 respectively.
+Note:
+You may assume k is always valid, 1 ≤ k ≤ number of unique elements.
+Input words contain only lowercase letters.
+Follow up:
+Try to solve it in O(n log k) time and O(n) extra space.
+Can you solve it in O(n) time with only O(k) extra space?
+
+class Solution {
+    public List<String> topKFrequent(String[] words, int k) {
+        List<String> result = new ArrayList<>();
+        if(words == null || words.length == 0 || k <= 0) {
+            return result;
+        }
+        int freq = 1;
+        Map<String, Integer> map = new HashMap<>();
+        for(String word: words) {
+            int f = map.getOrDefault(word, 0);
+            map.put(word, f + 1);
+            freq = Math.max(freq, f + 1);
+        }
+        List<String>[] bucket = new List[freq + 1];
+        for(String word: map.keySet()) {
+            int currentFreq = map.get(word);
+            if(bucket[currentFreq] == null) {
+                bucket[currentFreq] = new ArrayList<>();
+            }
+            bucket[currentFreq].add(word);
+        }
+        
+        for(int i = freq; i >= 0; i--) {
+            if(bucket[i] != null) {
+                List<String> list = bucket[i];
+                Collections.sort(list, new Comparator<String>() {
+                    public int compare(String s1, String s2) {
+                        int i = 0, j = 0;
+                        while(i < s1.length() && j < s2.length()) {
+                            if(s1.charAt(i) == s2.charAt(j)) {
+                                i++;
+                                j++;
+                            } else if(s1.charAt(i) < s2.charAt(j)) {
+                                return -1;
+                            } else {
+                                return 1;
+                            }
+                        }
+                        if(i == s1.length()) {
+                            return -1;
+                        }
+                        return 1;
+                    }
+                });
+                for(String s: list) {
+                    result.add(s);
+                    if(result.size() == k) {
+                        return result;
+                    }
+                }
+            }
+        }
+        return result;
+        
+        
+    }
+}
