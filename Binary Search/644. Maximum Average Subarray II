@@ -1,0 +1,70 @@
+644. Maximum Average Subarray II
+
+Given an array consisting of n integers, find the contiguous subarray whose length is greater than or equal to k that has the maximum average value. And you need to output the maximum average value.
+
+Example 1:
+Input: [1,12,-5,-6,50,3], k = 4
+Output: 12.75
+Explanation:
+when length is 5, maximum average value is 10.8,
+when length is 6, maximum average value is 9.16667.
+Thus return 12.75.
+Note:
+1 <= k <= n <= 10,000.
+Elements of the given array will be in range [-10,000, 10,000].
+The answer with the calculation error less than 10-5 will be accepted.
+
+class Solution {
+    public double findMaxAverage(int[] nums, int k) {
+        if(nums == null || nums.length == 0 || k <= 0) {
+            return 0.0;
+        }
+        double max = (double)Integer.MIN_VALUE;
+        double min = (double)Integer.MAX_VALUE;
+        for(int i = 0; i < nums.length; i++) {
+            max = Math.max(max, nums[i]);
+            min = Math.min(min, nums[i]);
+        }
+        
+        while(max - min > 0.00001) {
+            double mid = min + (max - min) / 2.0;
+            if(check(nums, mid, k)) {
+                min = mid;
+            } else {
+                max = mid;
+            }
+        }
+        return min;
+        
+    }
+
+
+    public boolean check(int[] nums, double mid, int k) {
+        int n = nums.length;
+        double[] a = new double[n];
+        for(int i = 0; i < n; i++) {
+            a[i] = nums[i] - mid;
+        }
+        
+        double now = 0, last = 0;
+        for(int i = 0; i < k; i++) {
+            now += a[i];
+        }
+        if(now > 0) {
+            return true;
+        }
+        
+        for(int i = k; i < n; i++) {
+            now += a[i];
+            last += a[i - k];
+            if(last < 0) {
+                now -= last;
+                last = 0;
+            }
+            if(now > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
