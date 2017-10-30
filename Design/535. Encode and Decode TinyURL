@@ -1,0 +1,62 @@
+535. Encode and Decode TinyURL
+
+TinyURL is a URL shortening service where you enter a URL such as https://leetcode.com/problems/design-tinyurl and it returns a short URL such as http://tinyurl.com/4e9iAk.
+
+Design the encode and decode methods for the TinyURL service. There is no restriction on how your encode/decode algorithm should work. You just need to ensure that a URL can be encoded to a tiny URL and the tiny URL can be decoded to the original URL.
+
+public class Codec {
+
+    // Encodes a URL to a shortened URL.
+    private int globalId = 0;
+    private Map<Integer, String> idToLongUrl = new HashMap<>();
+    private Map<String, Integer> longUrlToId = new HashMap<>();
+    private String chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public String encode(String longUrl) {
+        if(!longUrlToId.containsKey(longUrl)) {
+            idToLongUrl.put(globalId, longUrl);
+            longUrlToId.put(longUrl, globalId);
+        }
+        int id = longUrlToId.get(longUrl);
+        String s = toBase62(id);
+        globalId++;
+        return s;
+    }
+
+    // Decodes a shortened URL to its original URL.
+    public String decode(String shortUrl) {
+        int id = toId(shortUrl);
+        return idToLongUrl.get(id);
+    }
+    
+    private String toBase62(int id) {
+        StringBuffer sb = new StringBuffer();
+        while(id != 0) {
+            sb.append(chars.charAt(id % 62));
+            id /= 62;
+        }
+        return sb.toString();
+    }
+    
+    private int toId(String shortUrl) {
+        int id = 0;
+        for(int i = 0; i < shortUrl.length(); i++) {
+            int num = getNum(shortUrl.charAt(i));
+            id = id * 62 + num;
+        }
+        return id;
+    }
+    
+    private int getNum(char c) {
+        if(c >= '0' && c <= '9') {
+            return c - '0';
+        } else if(c >= 'a' && c <= 'z') {
+            return c - 'a' + 10;
+        } else {
+            return c - 'A' + 36;
+        }
+    }
+}
+
+// Your Codec object will be instantiated and called as such:
+// Codec codec = new Codec();
+// codec.decode(codec.encode(url));

@@ -11,48 +11,41 @@ pattern = "aabb", str = "xyzabcxzyabc" should return false.
 Notes:
 You may assume both pattern and str contains only lowercase letters.
 
-public class Solution {
+class Solution {
     public boolean wordPatternMatch(String pattern, String str) {
-        if((pattern == null) && str == null || (pattern.length() == 0 && str.length() == 0)) {
-            return true;
-        }
-        if(pattern == null || str == null || pattern.length() == 0 || str.length() == 0) {
+        if(pattern == null || str == null) {
             return false;
         }
-        Map<Character, String> map = new HashMap<Character, String>();
-        Set<String> set = new HashSet<String>();
-        return isMatch(str, 0, pattern, 0, map, set);
+        Map<Character, String> map = new HashMap<>();
+        return dfs(pattern, 0, str, 0, map);
     }
-    private boolean isMatch(String str, int i, String pattern, int j, Map<Character, String> map, Set<String> set) {
-        // base case
-        if(i == str.length() && j == pattern.length()) {
+    
+    private boolean dfs(String pattern, int p1, String str, int p2, Map<Character, String> map) {
+        if(p1 == pattern.length() && p2 == str.length()) {
             return true;
         }
-        if(i == str.length() || j == pattern.length()) {
+        if(p1 == pattern.length() || p2 == str.length()) {
             return false;
         }
-        char c = pattern.charAt(j);
+        char c = pattern.charAt(p1);
         if(map.containsKey(c)) {
-            String s = map.get(c);
-            if(!str.startsWith(s, i)) {
+            String word = map.get(c);
+            if(!str.startsWith(word, p2)) {
                 return false;
             }
-            return isMatch(str, i + s.length(), pattern, j + 1, map, set);
+            return dfs(pattern, p1 + 1, str, p2 + word.length(), map);
         }
-        // pattern character does not exist in the map
-        for(int k = i; k < str.length(); k++) {
-            String p = str.substring(i, k + 1);
-            if(set.contains(p)) {
+        
+        for(int i = p2; i < str.length(); i++) {
+            String word = str.substring(p2, i + 1);
+            if(map.containsValue(word)) {
                 continue;
             }
-            map.put(c, p);
-            set.add(p);
-            // continue to match the rest
-            if(isMatch(str, k + 1, pattern, j + 1, map, set)) {
+            map.put(c, word);
+            if(dfs(pattern, p1 + 1, str, p2 + word.length(), map)) {
                 return true;
             }
             map.remove(c);
-            set.remove(p);
         }
         return false;
     }
