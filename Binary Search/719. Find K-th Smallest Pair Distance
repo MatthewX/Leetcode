@@ -1,0 +1,96 @@
+719. Find K-th Smallest Pair Distance
+
+Given an integer array, return the k-th smallest distance among all the pairs. The distance of a pair (A, B) is defined as the absolute difference between A and B.
+
+Example 1:
+Input:
+nums = [1,3,1]
+k = 1
+Output: 0 
+Explanation:
+Here are all the pairs:
+(1,3) -> 2
+(1,1) -> 0
+(3,1) -> 2
+Then the 1st smallest distance pair is (1,1), and its distance is 0.
+Note:
+2 <= len(nums) <= 10000.
+0 <= nums[i] < 1000000.
+1 <= k <= len(nums) * (len(nums) - 1) / 2.
+
+
+An Efficient Solution is based on Binary Search.
+
+1) Sort the given array a[].
+2) We can easily find the least possible absolute
+   difference in O(n) after sorting. The largest
+   possible difference will be a[n-1] - a[0] after
+   sorting the array. Let low = minimum_difference
+   and high = maximum_difference.
+3) while low < high:
+4)     mid = (low + high)/2
+5)     if ((number of pairs with absolute difference
+                                <= mid) < k):
+6)        low = mid + 1
+7)     else:
+8)        high = mid
+9) return low
+
+We need a function that will tell us number of pairs with difference <= mid efficiently.
+Since our array is sorted, this part can be done like this:
+
+1) result = 0
+2) for i = 0 to n-1:
+3)     result = result + (upper_bound(a+i, a+n, a[i] + mid) - (a+i+1))
+4) return result
+Here upper_bound is a variant of binary search which returns a pointer to the first element from a[i] to a[n-1] which is greater than a[i] + mid. Let the pointer returned be j. Then a[i] + mid < a[j]. Thus, subtracting (a+i+1) from this will give us the number of values whose difference with a[i] is <= mid. We sum this up for all indices from 0 to n-1 and get the answer for current mid.
+
+class Solution {
+    public int smallestDistancePair(int[] nums, int k) {
+        if(nums == null || nums.length == 0) {
+            return 0;
+        }
+        Arrays.sort(nums);
+        int n = nums.length;
+        int high = nums[n - 1] - nums[0];
+        int low = nums[1] - nums[0];
+        for (int i = 1; i < n - 1; i++) {
+            low = Math.min(low, nums[i + 1] - nums[i]);
+        }
+        
+        while(low < high) {
+            int mid = low + (high - low) / 2;
+            int num = countPairs(nums, mid);
+            if(num >= k) {
+                high = mid;
+            } else {
+                low = mid + 1;
+            }
+        }
+        
+        return low;
+    }
+    
+    private int countPairs(int[] nums, int mid) {
+        int result = 0;
+        int n = nums.length;
+        for(int i = 0; i < nums.length; i++) {
+            result += upperbound(nums, i, n - 1, nums[i] + mid) - i - 1;
+        }
+        return result;
+    }
+
+    private int upperbound(int[] a, int low, int high, int key) {
+        if (a[high] <= key) return high + 1;
+        while (low < high) {
+            int mid = low + (high - low) / 2;
+            if (key >= a[mid]) {
+                low = mid + 1;
+            } else {
+                high = mid;
+            }
+        }
+        return low;
+    }
+    
+}
