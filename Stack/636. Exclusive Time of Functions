@@ -31,6 +31,32 @@ Functions could be called recursively, and will always end.
 
 class Solution {
     public int[] exclusiveTime(int n, List<String> logs) {
+        // start: push to stack
+        int[] result = new int[n];
+        if(n <= 0 || logs == null || logs.isEmpty()) {
+            return result;
+        }
+        int prev = 0;
+        Stack<Integer> stack = new Stack<>();
+        for(String log: logs) {
+            String[] s = log.split(":");
+            if(s[1].equals("start")) {
+                if(!stack.isEmpty()) {
+                    result[stack.peek()] += Integer.parseInt(s[2]) - prev;
+                }
+                stack.push(Integer.parseInt(s[0]));
+                prev = Integer.parseInt(s[2]);
+            } else {
+                result[stack.pop()] += Integer.parseInt(s[2]) - prev + 1;
+                prev = Integer.parseInt(s[2]) + 1;
+            }
+        }
+        return result;
+    }
+}
+
+class Solution {
+    public int[] exclusiveTime(int n, List<String> logs) {
         if(n <= 0 || logs == null || logs.isEmpty()) {
             return null;
         }

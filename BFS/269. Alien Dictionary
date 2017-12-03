@@ -39,29 +39,33 @@ You may assume that if a is a prefix of b, then a must appear before b in the gi
 If the order is invalid, return an empty string.
 There may be multiple valid order of letters, return any one of them is fine.
 
-public class Solution {
+class Solution {
     public String alienOrder(String[] words) {
         if(words == null || words.length == 0) {
             return "";
         }
-        HashMap<Character, Set<Character>> map = new HashMap<Character, Set<Character>>();
-        HashMap<Character, Integer> degree = new HashMap<Character, Integer>();
-        for(int i = 1; i < words.length; i++) {
-            String first = words[i - 1];
-            String second = words[i];
+        Map<Character, Integer> degree = new HashMap<>();
+        Map<Character, Set<Character>> map = new HashMap<>();
+        for(String s: words){
+            for(char c: s.toCharArray()){
+                degree.put(c, 0);
+            }
+        }
+        for(int i = 0; i < words.length - 1; i++) {
+            String first = words[i];
+            String second = words[i + 1];
             int j = 0;
             while(j < first.length() && j < second.length()) {
-                if(first.charAt(j) == second.charAt(j)) {
-                    if(!degree.containsKey(first.charAt(j))) {
-                        degree.put(first.charAt(j), 0);
-                    }
-                    j++;
-                } else {
-                    addToGraph(first.charAt(j), second.charAt(j), map, degree);
+                char c1 = first.charAt(j), c2 = second.charAt(j);
+                if(c1 != c2) {
+                    addToGraph(c1, c2, map, degree);
                     break;
+                } else {
+                    j++;
                 }
             }
         }
+        
         // Setup
         Queue<Character> queue = new LinkedList<Character>();
         for(char c: degree.keySet()) {
@@ -70,42 +74,31 @@ public class Solution {
             }
         }
         StringBuffer result = new StringBuffer();
-        int count = 0;
-        
-        // BFS
         while(!queue.isEmpty()) {
-            char current = queue.poll();
-            count++;
-            result.append(current);
-            if(map.get(current) == null) {
+            char c = queue.poll();
+            result.append(c);
+            if(map.get(c) == null) {
                 continue;
             }
-            for(char neighbor: map.get(current)) {
+            for(char neighbor: map.get(c)) {
                 degree.put(neighbor, degree.get(neighbor) - 1);
                 if(degree.get(neighbor) == 0) {
                     queue.offer(neighbor);
                 }
             }
         }
-        if(count == degree.size()) {
+        if(result.length() == degree.size()) {
             return result.toString();
         }
         return "";
+        
     }
-    private void addToGraph(char c1, char c2, HashMap<Character, Set<Character>> map, HashMap<Character, Integer> degree) {
-        if(!map.containsKey(c1)) {
-            map.put(c1, new HashSet<Character>());
-        }
-        if(!map.get(c1).contains(c2)) {
-            map.get(c1).add(c2);
-            if(!degree.containsKey(c2)) {
-                degree.put(c2, 1);
-            } else {
-                degree.put(c2, degree.get(c2) + 1);
-            }
-            if(!degree.containsKey(c1)) {
-                degree.put(c1, 0);
-            }
+    private void addToGraph(char c1, char c2, Map<Character, Set<Character>> map, Map<Character, Integer> degree) {
+        Set<Character> set = map.getOrDefault(c1, new HashSet<Character>());
+        if(!set.contains(c2)) {
+            set.add(c2);
+            map.put(c1, set);
+            degree.put(c2, degree.get(c2) + 1);
         }
     }
 }

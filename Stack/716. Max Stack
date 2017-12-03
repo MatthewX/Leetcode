@@ -1,0 +1,78 @@
+716. Max Stack
+
+Design a max stack that supports push, pop, top, peekMax and popMax.
+
+push(x) -- Push element x onto stack.
+pop() -- Remove the element on top of the stack and return it.
+top() -- Get the element on the top.
+peekMax() -- Retrieve the maximum element in the stack.
+popMax() -- Retrieve the maximum element in the stack, and remove it. If you find more than one maximum elements, only remove the top-most one.
+Example 1:
+MaxStack stack = new MaxStack();
+stack.push(5); 
+stack.push(1);
+stack.push(5);
+stack.top(); -> 5
+stack.popMax(); -> 5
+stack.top(); -> 1
+stack.peekMax(); -> 5
+stack.pop(); -> 1
+stack.top(); -> 5
+Note:
+-1e7 <= x <= 1e7
+Number of operations won't exceed 10000.
+The last four operations won't be called when stack is empty.
+
+public class MaxStack {
+
+    Stack<Integer> s1, s2, s3;
+    public MaxStack() {
+        s1 = new Stack<>();
+        s2 = new Stack<>();
+        s3 = new Stack<>();
+    }
+    
+    public void push(int x) {
+        s1.push(x);
+        if (s2.isEmpty() || x >= s2.peek())
+            s2.push(x);
+    }
+    
+    public int pop() {
+        int val = s1.pop();
+        if (!s2.isEmpty() && s2.peek() == val)
+            s2.pop();
+        return val;
+    }
+    
+    public int top() {
+        return s1.peek();
+    }
+    
+    public int peekMax() {
+        if (s2.isEmpty())
+            return s1.peek();
+        return s2.peek();
+    }
+    
+    public int popMax() {
+        int max = !s2.isEmpty() ? s2.pop() : s1.peek();
+        while (!s1.isEmpty() && s1.peek() != max)
+            s3.push(s1.pop());
+        
+        s1.pop();
+        while (!s3.isEmpty())
+            push(s3.pop());
+        return max;
+    }
+}
+
+/**
+ * Your MaxStack object will be instantiated and called as such:
+ * MaxStack obj = new MaxStack();
+ * obj.push(x);
+ * int param_2 = obj.pop();
+ * int param_3 = obj.top();
+ * int param_4 = obj.peekMax();
+ * int param_5 = obj.popMax();
+ */

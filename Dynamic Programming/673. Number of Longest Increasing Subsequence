@@ -17,35 +17,31 @@ class Solution {
         if(nums == null || nums.length == 0) {
             return 0;
         }
-        
         int n = nums.length;
-        int[] dp = new int[n];
+        int[] len = new int[n];
         int[] count = new int[n];
-        int maxLength = 1;
-        int result = 1;
-        dp[0] = 1;
+        len[0] = 1;
         count[0] = 1;
-        for(int i = 1; i < nums.length; i++) {
-            int currentLen = 1;
-            int currentCount = 1;
+        int maxLen = 1;
+        int result = 1;
+        for(int i = 1; i < n; i++) {
+            len[i] = 1;
+            count[i] = 1;
             for(int j = 0; j < i; j++) {
-                if(nums[j] < nums[i]) {
-                    if(dp[j] + 1 == currentLen) {
-                        currentCount += count[j];
-                    } else if(dp[j] + 1 > currentLen) {
-                        currentCount = count[j];
-                        currentLen = dp[j] + 1;
+                if(nums[i] > nums[j]) {
+                    if(len[i] < len[j] + 1) {
+                        len[i] = len[j] + 1;
+                        count[i] = count[j];
+                    } else if(len[i] == len[j] + 1) {
+                        count[i] += count[j];
                     }
                 }
             }
-
-            dp[i] = currentLen;
-            count[i] = currentCount;
-            if(currentLen == maxLength) {
-                result += currentCount;
-            } else if(currentLen > maxLength) {
-                result = currentCount;
-                maxLength = currentLen;
+            if(maxLen < len[i]) {
+                maxLen = len[i];
+                result = count[i];
+            } else if(maxLen == len[i]) {
+                result += count[i];
             }
         }
         return result;

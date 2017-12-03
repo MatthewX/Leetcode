@@ -22,6 +22,71 @@ Define an inner class TrieNode. TrieNode with isWord set to true means there is 
 addWord method can be easily done iteratively.
 It's easier to implement search method recursively, using another helper method. search(root, word, index) means: Search the character of the word at a index from root. Note that word[index] is in subtree of root in my definition, not at node root itself. When the last index has been searched, and the current node has isWord set to true, return true. If root is null, it means the current path ends earlier and is missing remaining characters starting from index.
 
+
+public class WordDictionary {
+
+    /** Initialize your data structure here. */
+    private TrieNode root;
+    public WordDictionary() {
+        root = new TrieNode();
+    }
+    
+    /** Adds a word into the data structure. */
+    public void addWord(String word) {
+        if(word == null) {
+            return;
+        }
+        TrieNode current = root;
+        for(int i = 0; i < word.length(); i++) {
+            char c = word.charAt(i);
+            TrieNode next = current.children.getOrDefault(c, new TrieNode());
+            current.children.put(c, next);
+            current = next;
+        }
+        current.isEnd = true;
+    }
+    
+    /** Returns if the word is in the data structure. A word could contain the dot character '.' to represent any one letter. */
+    public boolean search(String word) {
+        return search(root, word, 0);
+    }
+    private boolean search(TrieNode root, String word, int index) {
+        if(root == null) {
+            return false;
+        }
+        if(index == word.length()) {
+            return root.isEnd;
+        }
+        char c = word.charAt(index);
+        if(c == '.') {
+            for(int i = 0; i < 26; i++) {
+                if(search(root.children.get((char)('a' + i)), word, index + 1)) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            return search(root.children.get(c), word, index + 1);
+        }
+    }
+    
+    public class TrieNode {
+        private Map<Character, TrieNode> children;
+        private boolean isEnd;
+        public TrieNode() {
+            children = new HashMap<>();
+            isEnd = false;
+        }
+    }
+}
+
+/**
+ * Your WordDictionary object will be instantiated and called as such:
+ * WordDictionary obj = new WordDictionary();
+ * obj.addWord(word);
+ * boolean param_2 = obj.search(word);
+ */
+
 public class WordDictionary {
     private class TrieNode {
         TrieNode[] children;

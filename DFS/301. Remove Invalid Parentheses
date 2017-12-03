@@ -1,0 +1,121 @@
+301. Remove Invalid Parentheses
+
+Remove the minimum number of invalid parentheses in order to make the input string valid. Return all possible results.
+
+Note: The input string may contain letters other than the parentheses ( and ).
+
+Examples:
+"()())()" -> ["()()()", "(())()"]
+"(a)())()" -> ["(a)()()", "(a())()"]
+")(" -> [""]
+Credits:
+Special thanks to @hpplayer for adding this problem and creating all test cases.
+
+
+BFS
+class Solution {
+    public List<String> removeInvalidParentheses(String s) {
+        List<String> result = new ArrayList<>();
+        if(s == null) {
+            return result;
+        }
+        
+        Set<String> set = new HashSet<>();
+        Queue<String> queue = new LinkedList<>();
+        
+        set.add(s);
+        queue.offer(s);
+        boolean found = false;
+        int length = 0;
+        
+        while(!queue.isEmpty()) {
+            String current = queue.poll();
+            if(current.length() < length) {
+                continue;
+            }
+            
+            if(isValid(current)) {
+                result.add(current);
+                length = current.length();
+                found = true;
+            }
+            
+            if (found) continue;
+            
+            for (int i = 0; i < current.length(); i++) {
+            // we only try to remove left or right paren
+                if (current.charAt(i) != '(' && current.charAt(i) != ')') continue;
+        
+                String t = current.substring(0, i) + current.substring(i + 1);
+        
+                if (!set.contains(t)) {
+                // for each state, if it's not visited, add it to the queue
+                    queue.add(t);
+                    set.add(t);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    private boolean isValid(String s) {
+        int count = 0;
+    
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') count++;
+            if (c == ')' && count-- == 0) return false;
+        }
+    
+        return count == 0;
+    }
+}
+
+
+
+
+DFS
+class Solution {
+    public List<String> removeInvalidParentheses(String s) {
+        List<String> result = new ArrayList<>();
+        Set<String> set = new HashSet<>();
+        result.add("");
+        set.add("");
+        dfs(s, result, set);
+        return result;
+    }
+    
+    private void dfs(String s, List<String> result, Set<String> set) {
+        if(set.contains(s)) {
+            return;
+        }
+        if(result.get(0).length() > s.length()) {
+            return;
+        }
+        set.add(s);
+        if(isValid(s)) {
+            if(s.length() > result.get(0).length()) {
+                result.clear();
+            }
+            result.add(s);
+            return;
+        }
+        for(int i = 0; i < s.length(); i++) {
+            dfs(s.substring(0, i) + s.substring(i + 1), result, set);
+        }
+    }
+    
+    private boolean isValid(String s) {
+        int count = 0;
+    
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') count++;
+            if (c == ')' && count-- == 0) return false;
+        }
+    
+        return count == 0;
+    }
+    
+}

@@ -20,3 +20,18 @@ Note:
 All the strings in the input will only contain lowercase letters.
 The length of words will be in the range [1, 1000].
 The length of words[i] will be in the range [1, 30].
+
+class Solution {
+    public String longestWord(String[] words) {
+        Arrays.sort(words);
+        String result = "";
+        Set<String> set = new HashSet<>();
+        for(String word: words) {
+            if(word.length() == 1 || set.contains(word.substring(0, word.length() - 1))) {
+                set.add(word);
+                result = word.length() > result.length()? word: result;
+            }
+        }
+        return result;
+    }
+}
