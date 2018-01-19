@@ -1,0 +1,74 @@
+761. Special Binary String
+
+Special binary strings are binary strings with the following two properties:
+
+The number of 0's is equal to the number of 1's.
+Every prefix of the binary string has at least as many 1's as 0's.
+Given a special string S, a move consists of choosing two consecutive, non-empty, special substrings of S, and swapping them. (Two strings are consecutive if the last character of the first string is exactly one index before the first character of the second string.)
+
+At the end of any number of moves, what is the lexicographically largest resulting string possible?
+
+Example 1:
+Input: S = "11011000"
+Output: "11100100"
+Explanation:
+The strings "10" [occuring at S[1]] and "1100" [at S[3]] are swapped.
+This is the lexicographically largest string possible after some number of swaps.
+Note:
+
+S has length at most 50.
+S is guaranteed to be a special binary string as defined above.
+
+class Solution {
+    public String makeLargestSpecial(String S) {
+        String max = new String(S);
+        List<int[]> list = new ArrayList<>();
+        for(int i = 0; i < S.length() - 1; i++) {
+            for(int j = i + 1; j < S.length(); j++) {
+                if((j - i + 1) % 2 == 1) continue;
+                String cur = S.substring(i, j + 1);
+                if(isSpecial(cur)) {
+                    list.add(new int[]{i, j});
+                }
+            }
+        }
+        
+        for(int i = 0; i < list.size() - 1; i++) {
+            for(int j = i + 1; j < list.size(); j++) {
+                int[] special1 = list.get(i);
+                int[] special2 = list.get(j);
+                if(special1[1] == special2[0] - 1) {
+                    String newSpecial = swap(S, special1, special2);
+                    if(max.compareTo(newSpecial) < 0) {
+                        max = newSpecial;
+                    }
+                }
+            }
+        }
+        if(max.equals(S)) {
+            return S;
+        } else {
+            return makeLargestSpecial(max);
+        }
+        
+        
+    }
+    
+    private String swap(String s, int[] special1, int[] special2) {
+        return s.substring(0, special1[0]) + s.substring(special2[0], special2[1] + 1) + s.substring(special1[0], special1[1] + 1) + s.substring(special2[1] + 1);
+    }
+    
+    private boolean isSpecial(String s) {
+        if(s.charAt(0) != '1' || s.charAt(s.length() - 1) != '0') return false;
+        int count = 0;
+        for(int i = 0; i < s.length(); i++) {
+            if(s.charAt(i) == '1') {
+                count++;
+            } else {
+                count--;
+            }
+            if(count < 0) return false;
+        }
+        return count == 0;
+    }
+}
